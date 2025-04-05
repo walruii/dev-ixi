@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { createUser } from "@/serveractions/user";
+import { checkEmail, checkUsername, createUser } from "@/serveractions/user";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
+import { useState } from "react";
 const registerFormSchema = z.object({
   name: z.string().min(3).max(20),
+  username: z.string().min(3).max(20),
   email: z.string().email(),
   password: z.string(),
 });
@@ -24,16 +25,36 @@ const registerFormSchema = z.object({
 type TRegisterForm = z.infer<typeof registerFormSchema>;
 
 export default function RegisterForm() {
+  const [loading, setLoading] = useState(false);
   const form = useForm<TRegisterForm>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
       name: "",
+      username: "",
       email: "",
       password: "",
     },
   });
   async function onSubmit(values: TRegisterForm) {
-    console.log(values);
+    setLoading(true);
+    const isUserAvailable = await checkUsername(values);
+    if (isUserAvailable.status !== 200) {
+      setLoading(false);
+      form.setError("username", {
+        type: "manual",
+        message: "Username already exists",
+      });
+      return;
+    }
+    const isEmailAvailable = await checkEmail(values);
+    if (isEmailAvailable.status !== 200) {
+      setLoading(false);
+      form.setError("email", {
+        type: "manual",
+        message: "Email already exists",
+      });
+      return;
+    }
     const response = await createUser(values);
     if (response.status === 200) {
       signIn("credentials", {
@@ -44,6 +65,7 @@ export default function RegisterForm() {
     } else if (response.status === 409) {
       alert("User already exists");
     }
+    setLoading(false);
   }
   return (
     <Form {...form}>
@@ -59,6 +81,19 @@ export default function RegisterForm() {
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input placeholder="John" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>username</FormLabel>
+              <FormControl>
+                <Input placeholder="jhonreal" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,12 +125,9 @@ export default function RegisterForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
-        <Link href="/signin" passHref className="w-full">
-          <Button className="w-full" variant={"outline"}>
-            Sign In
-          </Button>
-        </Link>
+        <Button type="submit" disabled={loading}>
+          Sign Up
+        </Button>
       </form>
     </Form>
   );

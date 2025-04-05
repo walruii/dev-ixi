@@ -13,7 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
 const loginFormSchema = z.object({
   email: z.string().email(),
   password: z.string(),
@@ -46,7 +45,7 @@ export default function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="inder@abc.com" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -65,12 +64,7 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
-        <Link href="/register" passHref className="w-full">
-          <Button className="w-full" variant={"outline"}>
-            Register
-          </Button>
-        </Link>
+        <Button type="submit">Login</Button>
       </form>
     </Form>
   );
