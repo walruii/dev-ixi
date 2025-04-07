@@ -2,31 +2,8 @@
 import { Input } from "@/components/ui/input";
 import { searchSuggestions } from "@/serveractions/search";
 import { SearchIcon } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-
-// const testSug = [
-//   {
-//     id: 1,
-//     author: "Test Author 1",
-//     title: "Test Title 1",
-//     content: "Test Content 1",
-//     date: new Date().toLocaleDateString(),
-//   },
-//   {
-//     id: 2,
-//     author: "Test Author 2",
-//     title: "Test Title 2",
-//     content: "Test Content 2",
-//     date: new Date().toLocaleDateString(),
-//   },
-//   {
-//     id: 3,
-//     author: "Test Author 3",
-//     title: "Test Title 3",
-//     content: "Test Content 3",
-//     date: new Date().toLocaleDateString(),
-//   },
-// ];
 
 export default function Search() {
   const [search, setSearch] = useState("");
@@ -52,7 +29,7 @@ export default function Search() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleSearch(search);
-    }, 1000);
+    }, 500);
     return () => clearTimeout(timeoutId);
   }, [search]);
 
@@ -82,11 +59,12 @@ export default function Search() {
             <li
               key={suggestion.id}
               className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-zinc-600 cursor-pointer border-b"
-              onClick={() => setSearch(suggestion.title)}
             >
-              <p className="text-sm text-gray-500">@{suggestion.author}</p>
-              <strong>{suggestion.title}</strong>
-              <p className="text-sm text-gray-500">{suggestion.date}</p>
+              <Link href={`/p/${suggestion.id}`} className="block">
+                <p className="text-sm text-gray-500">{suggestion.author}</p>
+                <strong>{suggestion.title}</strong>
+                <p className="text-sm text-gray-500">{suggestion.date}</p>
+              </Link>
             </li>
           ))}
         </ul>

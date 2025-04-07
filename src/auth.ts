@@ -122,6 +122,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
               token.userId = response[0].id;
               token.name = response[0].name;
               token.image = response[0].image;
+              token.username = response[0].username;
               token.isRegistered = true;
             } else {
               token.isRegistered = false;

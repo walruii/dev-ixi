@@ -24,7 +24,7 @@ export default function ThemeChanger() {
 
   return (
     <button onClick={toggleTheme} className="flex items-center justify-center">
-      {theme === "light" ? <CiSun size={30} /> : <FaRegMoon size={30} />}
+      {theme === "light" ? <CiSun size={30} /> : <FaRegMoon size={25} />}
     </button>
   );
 }

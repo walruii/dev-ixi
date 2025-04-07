@@ -1,6 +1,7 @@
 import { GalleryVerticalEnd } from "lucide-react";
 import OnboardingForm from "./onboardingForm";
 import { auth } from "@/auth";
+import Image from "next/image";
 
 export default async function Onboarding() {
   const session = await auth();
@@ -22,10 +23,12 @@ export default async function Onboarding() {
         </div>
       </div>
       <div className="relative hidden bg-muted lg:block">
-        <img
+        <Image
           src="/placeholder.svg"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          height={1000}
+          width={1000}
         />
       </div>
     </div>

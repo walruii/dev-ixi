@@ -87,7 +87,7 @@ export default function OnboardingForm({
           )}
         />
         <Button type="submit" disabled={loading}>
-          Continue
+          {loading ? "Creating..." : "Continue"}
         </Button>
       </form>
     </Form>

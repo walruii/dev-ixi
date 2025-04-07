@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 const loginFormSchema = z.object({
   email: z.string().email(),
   password: z.string(),
@@ -21,6 +22,7 @@ const loginFormSchema = z.object({
 type TLoginForm = z.infer<typeof loginFormSchema>;
 
 export default function LoginForm() {
+  const [loading, setLoading] = useState(false);
   const form = useForm<TLoginForm>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -28,9 +30,13 @@ export default function LoginForm() {
       password: "",
     },
   });
-  function onSubmit(values: TLoginForm) {
-    console.log(values);
-    signIn("credentials", values);
+  async function onSubmit(values: TLoginForm) {
+    setLoading(true);
+    try {
+      await signIn("credentials", values);
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <Form {...form}>
@@ -64,7 +70,9 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Login</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Logging In..." : "Login"}
+        </Button>
       </form>
     </Form>
   );
