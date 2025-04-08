@@ -60,7 +60,14 @@ export default function Search() {
               key={suggestion.id}
               className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-zinc-600 cursor-pointer border-b"
             >
-              <Link href={`/p/${suggestion.id}`} className="block">
+              <Link
+                href={`/p/${suggestion.id}`}
+                className="block"
+                onClick={() => {
+                  setSearch("");
+                  setSuggestions([]);
+                }}
+              >
                 <p className="text-sm text-gray-500">{suggestion.author}</p>
                 <strong>{suggestion.title}</strong>
                 <p className="text-sm text-gray-500">{suggestion.date}</p>

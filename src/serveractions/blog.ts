@@ -44,11 +44,12 @@ export async function getPostById(id: string): Promise<TBlog | null> {
 
   try {
     const sql = await neon(process.env.DATABASE_URL as string);
-    const [post] =
-      await sql`SELECT "USER".username, "BLOG".id, "BLOG".title, "BLOG".content, "BLOG".created_at
-              FROM "USER"
-              RIGHT JOIN "BLOG" on "USER".id = "BLOG".author_id
-              WHERE "BLOG".id = ${id}`;
+    const [post] = await sql`
+      SELECT u.username, u.image, u.created_at u_created_at, b.id, b.title, b.content, b.created_at b_created_at
+      FROM "USER" u
+      RIGHT JOIN "BLOG" b on u.id = b.author_id
+      WHERE b.id = ${id}
+              `;
     if (!post) return null;
     return {
       id: post.id as number,
@@ -56,7 +57,9 @@ export async function getPostById(id: string): Promise<TBlog | null> {
       content: post.content as string,
       author_id: post.author_id as string,
       author_username: post.username as string,
-      created_at: post.created_at as Date,
+      author_image: post.image as string,
+      b_created_at: post.b_created_at as Date,
+      u_created_at: post.b_created_at as Date,
     };
   } catch (error) {
     console.error(error);
@@ -71,7 +74,7 @@ export async function getAllPosts({ limit = 7, page = 0 } = {}): Promise<
   try {
     const sql = await neon(process.env.DATABASE_URL as string);
     const blogs =
-      await sql`SELECT u.username, b.id, b.title, b.content, b.created_at 
+      await sql`SELECT u.username, u.created_at u_created_at, u.image, b.id, b.title, b.content, b.created_at b_created_at
                 FROM "BLOG" b
                 JOIN "USER" u on u.id = b.author_id
                 ORDER BY b.created_at DESC
@@ -83,7 +86,9 @@ export async function getAllPosts({ limit = 7, page = 0 } = {}): Promise<
       content: blog.content,
       author_id: blog.author_id,
       author_username: blog.username,
-      created_at: blog.created_at,
+      author_image: blog.image,
+      u_created_at: blog.u_created_at,
+      b_created_at: blog.b_created_at,
     }));
   } catch (error) {
     console.log(error);

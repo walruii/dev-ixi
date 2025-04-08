@@ -2,25 +2,39 @@
 import { useState, useEffect, useRef } from "react";
 import { getAllPosts } from "@/serveractions/blog";
 import { TBlog } from "@/models/blog";
-import { Card, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function Post({
-  post: { id, author_username, title, created_at },
+  post: { id, author_username, title, b_created_at, author_image },
 }: {
   post: TBlog;
 }) {
   return (
     <Link href={`/p/${id}`} passHref>
-      <Card className="w-full my-3 border-0">
+      <Card className="w-full mb-4 border-0">
         <CardContent>
-          <CardDescription className="text-base">
-            {author_username}
+          <CardDescription className="text-base flex items-center gap-2">
+            <Avatar>
+              <AvatarImage src={author_image}></AvatarImage>
+              <AvatarFallback>AN</AvatarFallback>
+            </Avatar>
+            <div>
+              {author_username}
+              <p className="text-xs text-zinc-500">
+                {b_created_at.toLocaleDateString()}
+              </p>
+            </div>
           </CardDescription>
-          <p className="text-xs text-zinc-500">
-            {created_at.toLocaleDateString()}
-          </p>
-          <h1 className="text-3xl font-bold">{title}</h1>
+          <CardTitle className="text-3xl font-bold pl-10 pt-2">
+            {title}
+          </CardTitle>
         </CardContent>
       </Card>
     </Link>

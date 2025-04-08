@@ -4,5 +4,7 @@ export type TBlog = {
   content: string;
   author_id: string;
   author_username: string;
-  created_at: Date;
+  author_image: string;
+  u_created_at: Date;
+  b_created_at: Date;
 };

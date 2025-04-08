@@ -9,7 +9,7 @@ import NavUser from "./navUser";
 export default function Navbar() {
   return (
     <nav className="bg-white dark:bg-zinc-900 dark:text-white border-b dark:border-zinc-700">
-      <div className="max-w-screen-xl mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-2xl mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
         <section className="flex gap-7">
           <Link
             href="/"
