@@ -37,14 +37,18 @@ export async function createPost({
   }
 }
 
-export async function getPostById(id: number | string): Promise<TBlog | null> {
+export async function getPostById(id: string): Promise<TBlog | null> {
+  if (!Number.isInteger(Number(id))) {
+    return null;
+  }
+
   try {
     const sql = await neon(process.env.DATABASE_URL as string);
     const [post] =
       await sql`SELECT "USER".username, "BLOG".id, "BLOG".title, "BLOG".content, "BLOG".created_at
-                FROM "USER"
-                RIGHT JOIN "BLOG" on "USER".id = "BLOG".author_id
-                WHERE "BLOG".id = ${id}`;
+              FROM "USER"
+              RIGHT JOIN "BLOG" on "USER".id = "BLOG".author_id
+              WHERE "BLOG".id = ${id}`;
     if (!post) return null;
     return {
       id: post.id as number,

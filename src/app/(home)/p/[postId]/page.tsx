@@ -19,12 +19,17 @@ async function PostPageAsync({
     );
   }
   return (
-    <article>
+    <article className="mt-5 dark:bg-zinc-900 rounded-md bg-white max-w-screen-md mx-auto p-4">
+      <div className="pb-5 flex justify-between">
+        <p className="text-zinc-400">Post by {post.author_username}</p>
+        <p className="text-zinc-400">{post.created_at.toLocaleDateString()}</p>
+      </div>
+      <h1 className="w-full text-4xl sm:text-5xl font-bold">{post.title}</h1>
+      <div className="border-t w-full pb-10" />
       <div
-        className={`prose prose-sm max-w-screen-md p-4 overflow-y-scroll h-full w-full dark:bg-zinc-900 mx-auto rounded-lg bg-zinc-100
+        className={`prose prose-sm overflow-y-scroll h-full w-full max-w-screen-md
        dark:text-white dark:prose-headings:text-white dark:prose-blockquote:text-white dark:prose-a:text-white dark:prose-em:text-white dark:prose-strong:text-white dark:prose-li:text-white dark:prose-code:text-white dark:prose-ol:text-white dark:prose-ul:text-white`}
       >
-        <h1 className="">{post.author_username}</h1>
         <Markdown
           remarkPlugins={[gfm]}
           components={{

@@ -4,7 +4,6 @@ import { getAllPosts } from "@/serveractions/blog";
 import { TBlog } from "@/models/blog";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
-import Loading from "../loading";
 
 function Post({
   post: { id, author_username, title, created_at },
@@ -72,7 +71,11 @@ export default function Feed() {
       {posts.map((post) => (
         <Post key={post.id} post={post} />
       ))}
-      {loading && <Loading />}
+      {loading && (
+        <div className="flex justify-center items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+        </div>
+      )}
       <div ref={observerRef} className="h-10" />
       {!hasMore && !loading && (
         <p className="text-center text-zinc-500">No more posts available.</p>

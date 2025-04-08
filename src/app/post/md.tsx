@@ -62,7 +62,7 @@ export default function MD() {
   };
 
   return (
-    <form className=" max-w-screen-xl m-auto w-full h-full">
+    <form className=" max-w-screen-2xl m-auto w-full h-full">
       <div className="mb-2 flex justify-between">
         <div>
           <Button
@@ -95,7 +95,7 @@ export default function MD() {
         </Button>
       </div>
       <Input
-        className="font-bold text-3xl py-8"
+        className="font-bold text-3xl py-8 bg-white"
         value={post.title}
         onChange={(e) =>
           setPost((prev) => ({ ...prev, title: e.target.value }))
@@ -104,14 +104,14 @@ export default function MD() {
       {!diffMode ? (
         <div className="w-full h-full flex">
           <Textarea
-            className={`h-full dark:text-white bg-zinc-100`}
+            className={`h-full dark:text-white bg-white max-screen-md rounded-lg`}
             onChange={(e) =>
               setPost((prev) => ({ ...prev, content: e.target.value }))
             }
             value={post.content}
           />
           <div
-            className={`prose prose-sm p-4 overflow-y-scroll h-full w-full dark:bg-zinc-900 mx-auto rounded-lg max-w-none bg-zinc-100
+            className={`prose prose-sm p-4 overflow-y-scroll h-full w-full dark:bg-zinc-900 mx-auto rounded-lg max-w-screen-md bg-white
        dark:text-white dark:prose-headings:text-white dark:prose-blockquote:text-white dark:prose-a:text-white dark:prose-em:text-white dark:prose-strong:text-white dark:prose-li:text-white dark:prose-code:text-white dark:prose-ol:text-white dark:prose-ul:text-white`}
           >
             <Markdown
@@ -129,7 +129,7 @@ export default function MD() {
         <div className="w-full h-full flex">
           {isPreview ? (
             <Textarea
-              className={`h-full dark:text-white bg-zinc-100`}
+              className={`h-full dark:text-white bg-white max-w-screen-md rounded-lg`}
               onChange={(e) =>
                 setPost((prev) => ({ ...prev, content: e.target.value }))
               }
@@ -137,7 +137,7 @@ export default function MD() {
             />
           ) : (
             <div
-              className={`prose p-4 prose-sm overflow-y-scroll h-full w-full dark:bg-zinc-900 mx-auto rounded-lg max-w-none bg-zinc-100
+              className={`prose p-4 prose-sm overflow-y-scroll h-full w-full dark:bg-zinc-900 mx-auto rounded-lg max-w-screen-md bg-white
        dark:text-white dark:prose-headings:text-white dark:prose-blockquote:text-white dark:prose-a:text-white dark:prose-em:text-white dark:prose-strong:text-white dark:prose-li:text-white dark:prose-code:text-white dark:prose-ol:text-white dark:prose-ul:text-white`}
             >
               <Markdown remarkPlugins={[gfm]}>{post.content}</Markdown>

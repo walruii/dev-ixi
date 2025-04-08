@@ -11,9 +11,12 @@ export default function Navbar() {
     <nav className="bg-white dark:bg-zinc-900 dark:text-white border-b dark:border-zinc-700">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
         <section className="flex gap-7">
-          <h1 className="text-3xl font-stretch-ultra-expanded font-mono font-bold">
+          <Link
+            href="/"
+            className="text-3xl font-stretch-ultra-expanded font-mono font-bold"
+          >
             DEV_IXI
-          </h1>
+          </Link>
           <Search />
         </section>
         <section className="items-center gap-4 hidden md:flex">
