@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { TBlog } from "@/models/blog";
+import { TBlogPartial } from "@/models/blog";
 import {
   Card,
   CardContent,
@@ -14,7 +14,7 @@ import { getAllBlogs } from "@/serveractions/blog";
 function Post({
   post: { id, author_username, title, b_created_at, author_image },
 }: {
-  post: TBlog;
+  post: TBlogPartial;
 }) {
   return (
     <Link href={`/p/${id}`} passHref>
@@ -42,7 +42,7 @@ function Post({
 }
 
 export default function Feed() {
-  const [posts, setPosts] = useState<TBlog[]>([]);
+  const [posts, setPosts] = useState<TBlogPartial[]>([]);
   const [lastSeen, setLastSeen] = useState<{ time: Date; blog_id: number }>({
     time: new Date(),
     blog_id: 0,

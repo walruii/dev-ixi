@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { TBlog } from "@/models/blog";
+import { TBlog, TBlogPartial } from "@/models/blog";
 import { neon } from "@neondatabase/serverless";
 // import { redirect } from "next/navigation";
 
@@ -57,7 +57,7 @@ comment_counts AS (
   FROM "COMMENT"
   GROUP BY blog_id
 )
-SELECT u.username, u.image, u.created_at AS u_created_at, 
+SELECT u.username, u.image, u.created_at AS u_created_at, u.description as u_description, 
        b.id, b.title, b.content, b.created_at AS b_created_at,
       COALESCE(lc.like_count, 0) as like_count,
       COALESCE(cc.comment_count, 0) as comment_count
@@ -79,6 +79,7 @@ SELECT u.username, u.image, u.created_at AS u_created_at,
       u_created_at: post.b_created_at as Date,
       like_count: post.like_count as number,
       comment_count: post.comment_count as number,
+      author_description: post.u_description as string,
     };
   } catch (error) {
     console.error(error);
@@ -96,7 +97,7 @@ export async function getAllBlogs({
     time: Date;
     blog_id: number;
   };
-}): Promise<TBlog[]> {
+}): Promise<TBlogPartial[]> {
   try {
     const sql = await neon(process.env.DATABASE_URL as string);
     const blogs = await sql`
@@ -110,8 +111,8 @@ comment_counts AS (
   FROM "COMMENT"
   GROUP BY blog_id
 )
-SELECT u.username, u.image, u.created_at AS u_created_at, 
-       b.id, b.title, b.content, b.created_at AS b_created_at,
+SELECT u.username, u.image, u.created_at AS u_created_at, u.description as u_description, 
+       b.id, b.title, b.created_at AS b_created_at,
       COALESCE(lc.like_count, 0) as like_count,
       COALESCE(cc.comment_count, 0) as comment_count
       FROM "BLOG" b
@@ -128,11 +129,9 @@ SELECT u.username, u.image, u.created_at AS u_created_at,
     return blogs.map((blog) => ({
       id: blog.id,
       title: blog.title,
-      content: blog.content,
       author_id: blog.author_id,
       author_username: blog.username,
       author_image: blog.image,
-      u_created_at: blog.u_created_at,
       b_created_at: blog.b_created_at,
       like_count: blog.like_count,
       comment_count: blog.comment_count,

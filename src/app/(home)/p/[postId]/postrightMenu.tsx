@@ -10,7 +10,7 @@ export default function PostRightMenu({
   blog: TBlog;
   className?: string;
 }) {
-  const { author_image, author_username } = blog;
+  const { author_image, author_username, author_description } = blog;
   return (
     <div className={` ${className}`}>
       <div className="bg-white dark:bg-zinc-900 rounded-xl w-full shadow p-5 flex flex-col gap-2">
@@ -23,7 +23,11 @@ export default function PostRightMenu({
         </div>
         <Button variant={"default"}>Follow</Button>
         <div className="border-t w-full pb-5 mt-5" />
-        <div>THIS WILL BE A DESCRIPTION HERE // devnote fix</div>
+        {author_description ? (
+          <div>{author_description}</div>
+        ) : (
+          <div>Hello!</div>
+        )}
       </div>
       <Footer />
     </div>
