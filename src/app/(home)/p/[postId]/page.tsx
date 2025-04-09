@@ -25,17 +25,17 @@ async function PostPageAsync({
   }
   return (
     <div className="flex my-8 px-4 max-w-screen-2xl mx-auto relative">
-      <div className="hidden sm:block w-48 shrink-0 ml-auto" />
+      <div className="hidden sm:block sm:w-20 lg:w-48 shrink-0 ml-auto" />
       <PostLeftMenu
         blog={blog}
-        className="hidden sm:flex w-48 shrink-0 ml-auto"
+        className="hidden sm:flex sm:w-20 lg:w-48 shrink-0 ml-auto"
       />
       <section className="flex-col items-center justify-center w-full">
         <article className="dark:bg-zinc-900 rounded-xl bg-white md:px-15 p-5 md:p-10 sm:mx-4 px-6 lg:px-8 mb-4">
           <div className="pb-5 flex justify-between">
             <div className="flex gap-2 justify-center items-center">
               <Avatar className="w-10 h-10">
-                <AvatarImage src={blog.author_image} alt="User Ima:e" />
+                <AvatarImage src={blog.author_image} alt="User Image" />
                 <AvatarFallback>AN</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
@@ -71,7 +71,10 @@ async function PostPageAsync({
             </Markdown>
           </div>
         </article>
-        <CommentSection className="dark:bg-zinc-900 rounded-xl bg-white md:px-15 p-5 md:p-10 sm:mx-4 px-6 lg:px-8" />
+        <CommentSection
+          blogId={blog.id}
+          className="dark:bg-zinc-900 rounded-xl bg-white md:px-15 p-5 md:p-10 sm:mx-4 px-6 lg:px-8"
+        />
       </section>
       <PostRightMenu
         blog={blog}

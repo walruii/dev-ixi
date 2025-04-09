@@ -1,5 +1,6 @@
 "use client";
 import { likeBlog } from "@/serveractions/blog";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { GoHeart, GoHeartFill } from "react-icons/go";
 
@@ -15,11 +16,15 @@ export default function LikeButton({
   const [isLiked, setIsLiked] = useState(isLikedByUser);
   const [likeCount, setLikeCount] = useState<number>(Number(likes));
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleLike = async () => {
     if (isLoading) return;
     setIsLoading(true);
-    await likeBlog({ blogId });
+    const res = await likeBlog({ blogId });
+    if (res.status === 401) {
+      router.push("/signin");
+    }
     setIsLiked(!isLiked);
     setLikeCount(likeCount + (isLiked ? -1 : 1));
     setIsLoading(false);

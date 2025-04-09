@@ -5,7 +5,7 @@ import Markdown from "react-markdown";
 import gfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createPost } from "@/serveractions/blog";
+import { createBlog } from "@/serveractions/blog";
 
 export default function MD() {
   const [post, setPost] = useState<{ title: string; content: string }>({
@@ -45,7 +45,7 @@ export default function MD() {
 
     try {
       setIsLoading(true);
-      const response = await createPost(post);
+      const response = await createBlog(post);
 
       if (response.status === 201) {
         alert("Post created successfully.");
@@ -118,7 +118,13 @@ export default function MD() {
               remarkPlugins={[gfm]}
               components={{
                 img: ({ src, alt }) =>
-                  src ? <img src={src} alt={alt || "Image"} /> : null,
+                  src ? (
+                    <img
+                      src={src}
+                      alt={alt || "Image"}
+                      className="rounded-lg mx-auto"
+                    />
+                  ) : null,
               }}
             >
               {post.content}

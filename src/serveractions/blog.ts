@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { TBlog } from "@/models/blog";
 import { neon } from "@neondatabase/serverless";
+// import { redirect } from "next/navigation";
 
 export async function createBlog({
   title,
@@ -19,6 +20,7 @@ export async function createBlog({
     const sql = await neon(process.env.DATABASE_URL as string);
     const session = await auth();
     if (!session?.user) {
+      // redirect("/signin");
       return { status: 401, error: "Unauthorized" };
     }
     const userId = session.user.userId;
