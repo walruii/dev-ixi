@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { getAllPosts } from "@/serveractions/blog";
 import { TBlog } from "@/models/blog";
 import {
   Card,
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAllBlogs } from "@/serveractions/blog";
 
 function Post({
   post: { id, author_username, title, b_created_at, author_image },
@@ -43,25 +43,38 @@ function Post({
 
 export default function Feed() {
   const [posts, setPosts] = useState<TBlog[]>([]);
-  const [page, setPage] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [lastSeen, setLastSeen] = useState<{ time: Date; blog_id: number }>({
+    time: new Date(),
+    blog_id: 0,
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (loading || !hasMore) return;
+
     const fetchPosts = async () => {
-      console.log(page);
       setLoading(true);
-      const newPosts = await getAllPosts({ page }); // Update `getAllPosts` to accept a page parameter
-      setPosts((prev) => [...prev, ...newPosts]);
-      setHasMore(newPosts.length > 0);
-      setLoading(false);
+      try {
+        const newPosts = await getAllBlogs({ lastSeen });
+        setPosts((prev) => [...prev, ...newPosts]);
+        setHasMore(newPosts.length > 0);
+
+        if (newPosts.length > 0) {
+          const lastBlog = newPosts[newPosts.length - 1];
+          setLastSeen({ time: lastBlog.b_created_at, blog_id: lastBlog.id });
+        }
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        setLoading(false);
+      }
     };
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
           fetchPosts();
         }
       },
@@ -78,7 +91,7 @@ export default function Feed() {
         observer.unobserve(currentRef);
       }
     };
-  }, [hasMore, loading, page]);
+  }, [hasMore, loading, lastSeen, posts]);
 
   return (
     <>

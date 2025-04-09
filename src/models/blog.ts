@@ -7,4 +7,6 @@ export type TBlog = {
   author_image: string;
   u_created_at: Date;
   b_created_at: Date;
+  like_count: number;
+  comment_count: number;
 };
