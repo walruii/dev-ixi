@@ -14,7 +14,10 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { checkEmail, checkUsername, createUser } from "@/serveractions/user";
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AlertContext } from "@/app/(alerts)/alertProvider";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 const registerFormSchema = z.object({
   name: z.string().min(3).max(20),
   username: z.string().min(3).max(20),
@@ -25,6 +28,7 @@ const registerFormSchema = z.object({
 type TRegisterForm = z.infer<typeof registerFormSchema>;
 
 export default function RegisterForm() {
+  const alertContext = useContext(AlertContext);
   const [loading, setLoading] = useState(false);
   const form = useForm<TRegisterForm>({
     resolver: zodResolver(registerFormSchema),
@@ -63,7 +67,13 @@ export default function RegisterForm() {
         redirect: true,
       });
     } else if (response.status === 409) {
-      alert("User already exists");
+      alertContext?.setAlert(
+        <Alert variant={"destructive"}>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>User Already exists</AlertDescription>
+        </Alert>
+      );
     }
     setLoading(false);
   }

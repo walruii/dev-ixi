@@ -30,9 +30,11 @@ export async function createBlog({
     if (existingPost) {
       return { status: 409, error: "Post already exists" };
     }
-    await sql`INSERT INTO "BLOG" (title, content, author_id, created_at) 
-              VALUES (${title}, ${content}, ${userId}, ${created_at})`;
-    return { status: 201, message: "Post created successfully" };
+    const [blog] =
+      await sql`INSERT INTO "BLOG" (title, content, author_id, created_at) 
+              VALUES (${title}, ${content}, ${userId}, ${created_at})
+              RETURNING id`;
+    return { status: 201, id: blog.id };
   } catch (error) {
     console.error("Error creating post:", error);
     return { status: 500, error: "Internal Server Error" };
@@ -57,7 +59,7 @@ comment_counts AS (
   FROM "COMMENT"
   GROUP BY blog_id
 )
-SELECT u.username, u.image, u.created_at AS u_created_at, u.description as u_description, 
+SELECT u.id as author_id, u.username, u.image, u.created_at AS u_created_at, u.description as u_description, 
        b.id, b.title, b.content, b.created_at AS b_created_at,
       COALESCE(lc.like_count, 0) as like_count,
       COALESCE(cc.comment_count, 0) as comment_count

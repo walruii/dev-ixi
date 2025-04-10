@@ -14,9 +14,12 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { checkUsername, createUserGoogle } from "@/serveractions/user";
 import { signOut } from "next-auth/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
+import { AlertContext } from "@/app/(alerts)/alertProvider";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 const registerFormSchema = z.object({
   username: z.string().min(3).max(20),
@@ -29,6 +32,7 @@ export default function OnboardingForm({
 }: {
   session: Session | null;
 }) {
+  const alertContext = useContext(AlertContext);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   if (!session || !session.user) {
@@ -63,7 +67,13 @@ export default function OnboardingForm({
     if (response.status === 200) {
       router.push("/");
     } else if (response.status === 409) {
-      alert("User already exists");
+      alertContext?.setAlert(
+        <Alert variant={"destructive"}>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>Username Already exists</AlertDescription>
+        </Alert>
+      );
     }
     setLoading(false);
   }

@@ -1,11 +1,15 @@
 "use client";
+import { AlertContext } from "@/app/(alerts)/alertProvider";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { createComment } from "@/serveractions/comment";
+import { Terminal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 export default function CreateComment({ blogId }: { blogId: number }) {
+  const alertContext = useContext(AlertContext);
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -13,7 +17,13 @@ export default function CreateComment({ blogId }: { blogId: number }) {
     if (loading) return;
     setLoading(true);
     if (content.trim() === "") {
-      alert("Comment cannot be empty");
+      alertContext?.setAlert(
+        <Alert variant={"destructive"}>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>Comment cannot be empty!</AlertDescription>
+        </Alert>
+      );
       setLoading(false);
       return;
     }
@@ -23,12 +33,25 @@ export default function CreateComment({ blogId }: { blogId: number }) {
         router.push("/signin");
         return;
       }
-      alert("Failed to create comment");
+      alertContext?.setAlert(
+        <Alert variant={"destructive"}>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>Failed To Comment</AlertDescription>
+        </Alert>
+      );
       setLoading(false);
       return;
     }
-    alert("Comment created successfully");
+    alertContext?.setAlert(
+      <Alert variant={"default"}>
+        <Terminal className="h-4 w-4" />
+        <AlertTitle>Success</AlertTitle>
+        <AlertDescription>Comment successfully</AlertDescription>
+      </Alert>
+    );
     setContent(""); // Clear the textarea after submission
+    router.refresh();
     setLoading(false);
   };
   return (

@@ -1,13 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import Markdown from "react-markdown";
 import gfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createBlog } from "@/serveractions/blog";
+import { AlertContext } from "../(alerts)/alertProvider";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
+import Link from "next/link";
 
 export default function MD() {
+  const alertContext = useContext(AlertContext);
   const [post, setPost] = useState<{ title: string; content: string }>({
     title: "Your Title Here",
     content: "# Hello World",
@@ -38,8 +43,20 @@ export default function MD() {
   const handlePost = async () => {
     if (isLoading) return;
 
-    if (!post.title.trim() || !post.content.trim()) {
-      alert("Please enter a title and content.");
+    if (
+      !post.title.trim() ||
+      !post.content.trim() ||
+      post.title === "Your Title Here"
+    ) {
+      alertContext?.setAlert(
+        <Alert variant={"destructive"}>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Please enter valid title and content
+          </AlertDescription>
+        </Alert>
+      );
       return;
     }
 
@@ -48,14 +65,49 @@ export default function MD() {
       const response = await createBlog(post);
 
       if (response.status === 201) {
-        alert("Post created successfully.");
+        alertContext?.setAlert(
+          <Alert variant={"default"}>
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Success</AlertTitle>
+            <AlertDescription>
+              Post created successfully. You can view it
+              <Link href={`/p/${response.id}`} passHref>
+                <Button>Link to Post</Button>
+              </Link>
+            </AlertDescription>
+          </Alert>
+        );
         setPost({ title: "", content: "" });
-      } else {
-        alert("Error creating post. Please try again.");
+      } else if (response.status === 401) {
+        alertContext?.setAlert(
+          <Alert variant={"destructive"}>
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>Please sign in to create a post</AlertDescription>
+          </Alert>
+        );
+      } else if (response.status === 409) {
+        alertContext?.setAlert(
+          <Alert variant={"destructive"}>
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Post with the same title already exists
+            </AlertDescription>
+          </Alert>
+        );
       }
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("An unexpected error occurred. Please try again.");
+      alertContext?.setAlert(
+        <Alert variant={"destructive"}>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Please try again later. If the problem persists, contact support.
+          </AlertDescription>
+        </Alert>
+      );
     } finally {
       setIsLoading(false);
     }

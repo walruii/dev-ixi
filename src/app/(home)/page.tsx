@@ -4,7 +4,7 @@ import Loading from "../loading";
 import RightMenu from "./rightMenu";
 import LeftMenu from "./leftMenu";
 
-export default function Home() {
+export default async function Home() {
   return (
     <main className="my-8 max-w-screen-2xl mx-auto flex px-4">
       <LeftMenu className="hidden sm:block w-48 shrink-0 ml-auto" />

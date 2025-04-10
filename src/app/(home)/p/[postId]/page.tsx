@@ -5,7 +5,7 @@ import Loading from "@/app/loading";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import PostLeftMenu from "./(leftMenu)/postleftMenu";
-import PostRightMenu from "./postrightMenu";
+import PostRightMenu from "./(rightMenu)/postrightMenu";
 import { getBlogById } from "@/serveractions/blog";
 import CommentSection from "./(commentSection)/commentSection";
 
