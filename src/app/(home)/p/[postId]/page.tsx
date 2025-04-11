@@ -9,6 +9,7 @@ import PostRightMenu from "./(rightMenu)/postrightMenu";
 import { getBlogById } from "@/serveractions/blog";
 import CommentSection from "./(commentSection)/commentSection";
 import Link from "next/link";
+import { COMPONENTS } from "@/lib/reactMarkdown";
 
 async function PostPageAsync({
   params,
@@ -57,21 +58,9 @@ async function PostPageAsync({
           <div className="border-t w-full pb-5 mt-5" />
           <div
             className={`prose overflow-y-scroll h-full w-full max-w-screen-lg
-       dark:text-white dark:prose-headings:text-white dark:prose-blockquote:text-white dark:prose-a:text-white dark:prose-em:text-white dark:prose-strong:text-white dark:prose-li:text-white dark:prose-code:text-white dark:prose-ol:text-white dark:prose-ul:text-white`}
+       dark:text-white dark:prose-headings:text-white dark:prose-blockquote:text-white dark:prose-a:text-white dark:prose-em:text-white dark:prose-strong:text-white dark:prose-li:text-white dark:prose-ol:text-white dark:prose-ul:text-white`}
           >
-            <Markdown
-              remarkPlugins={[gfm]}
-              components={{
-                img: ({ src, alt }) =>
-                  src ? (
-                    <img
-                      src={src}
-                      alt={alt || "Image"}
-                      className="rounded-lg mx-auto"
-                    />
-                  ) : null,
-              }}
-            >
+            <Markdown remarkPlugins={[gfm]} components={COMPONENTS}>
               {blog.content}
             </Markdown>
           </div>

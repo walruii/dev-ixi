@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { searchSuggestions } from "@/serveractions/search";
 import { SearchIcon } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Search() {
   const [search, setSearch] = useState("");
@@ -16,6 +16,7 @@ export default function Search() {
       date: string;
     }[]
   >([]);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = async (query: string) => {
     if (query.length < 3) {
@@ -33,8 +34,24 @@ export default function Search() {
     return () => clearTimeout(timeoutId);
   }, [search]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setSuggestions([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div>
+    <div ref={searchRef}>
       <label htmlFor="search" className="sr-only">
         Search
       </label>

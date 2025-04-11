@@ -1,137 +1,59 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
-import Markdown from "react-markdown";
-import gfm from "remark-gfm";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createBlog } from "@/serveractions/blog";
-import { AlertContext } from "../(alerts)/alertProvider";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal } from "lucide-react";
-import Link from "next/link";
+import { usePostEditor } from "@/hooks/useBlogEditor";
+import EditView from "./editView";
+import { PreviewView } from "./previewView";
 
 export default function MD() {
-  const alertContext = useContext(AlertContext);
-  const [post, setPost] = useState<{ title: string; content: string }>({
-    title: "Your Title Here",
-    content: "# Hello World",
-  });
-  const [diffMode, setDiffMode] = useState<boolean>(false);
-  const [isPreview, setIsPreview] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<"compare" | "single">("compare");
+  const [singleViewMode, setSingleViewMode] = useState<"edit" | "preview">(
+    "edit"
+  );
+  const { post, setPost, handlePost, isLoading } = usePostEditor();
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      localStorage.setItem("post", JSON.stringify(post));
-    }, 2000);
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [post]);
-
-  useEffect(() => {
-    const storedPost = localStorage.getItem("post");
-    if (storedPost) {
-      const localPost = JSON.parse(storedPost);
-      if (localPost.title !== "" && localPost.content !== "") {
-        setPost(JSON.parse(storedPost));
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setViewMode("single");
       }
-    }
+    };
+
+    handleResize(); // Check on initial render
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
-  const handlePost = async () => {
-    if (isLoading) return;
-
-    if (
-      !post.title.trim() ||
-      !post.content.trim() ||
-      post.title === "Your Title Here"
-    ) {
-      alertContext?.setAlert(
-        <Alert variant={"destructive"}>
-          <Terminal className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Please enter valid title and content
-          </AlertDescription>
-        </Alert>
-      );
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const response = await createBlog(post);
-
-      if (response.status === 201) {
-        alertContext?.setAlert(
-          <Alert variant={"default"}>
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>Success</AlertTitle>
-            <AlertDescription>
-              Post created successfully. You can view it
-              <Link href={`/p/${response.id}`} passHref>
-                <Button>Link to Post</Button>
-              </Link>
-            </AlertDescription>
-          </Alert>
-        );
-        setPost({ title: "", content: "" });
-      } else if (response.status === 401) {
-        alertContext?.setAlert(
-          <Alert variant={"destructive"}>
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>Please sign in to create a post</AlertDescription>
-          </Alert>
-        );
-      } else if (response.status === 409) {
-        alertContext?.setAlert(
-          <Alert variant={"destructive"}>
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              Post with the same title already exists
-            </AlertDescription>
-          </Alert>
-        );
-      }
-    } catch (error) {
-      console.error("Error creating post:", error);
-      alertContext?.setAlert(
-        <Alert variant={"destructive"}>
-          <Terminal className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Please try again later. If the problem persists, contact support.
-          </AlertDescription>
-        </Alert>
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <form className=" max-w-screen-2xl m-auto w-full h-full">
+    <form className="max-w-screen-2xl m-auto w-full h-full">
       <div className="mb-2 flex justify-between">
         <div>
           <Button
             variant={"default"}
             type="button"
             className="mr-2"
-            onClick={() => setDiffMode(!diffMode)}
+            onClick={() =>
+              setViewMode((prev) => (prev === "compare" ? "single" : "compare"))
+            }
+            disabled={viewMode === "single" && window.innerWidth < 768}
           >
-            Diff Mode
+            {viewMode === "compare" ? "Single View" : "Compare View"}
           </Button>
-          {diffMode && (
+          {viewMode === "single" && (
             <Button
               variant={"secondary"}
-              onClick={() => setIsPreview(!isPreview)}
+              onClick={() =>
+                setSingleViewMode((prev) =>
+                  prev === "edit" ? "preview" : "edit"
+                )
+              }
               type="button"
             >
-              Preview Mode
+              {singleViewMode === "edit" ? "Preview" : "Edit"}
             </Button>
           )}
         </div>
@@ -153,56 +75,26 @@ export default function MD() {
           setPost((prev) => ({ ...prev, title: e.target.value }))
         }
       />
-      {!diffMode ? (
-        <div className="w-full h-full flex">
-          <Textarea
-            className={`h-full dark:text-white bg-white max-screen-md rounded-lg`}
-            onChange={(e) =>
-              setPost((prev) => ({ ...prev, content: e.target.value }))
-            }
-            value={post.content}
-          />
-          <div
-            className={`prose prose-sm p-4 overflow-y-scroll h-full w-full dark:bg-zinc-900 mx-auto rounded-lg max-w-screen-md bg-white
-       dark:text-white dark:prose-headings:text-white dark:prose-blockquote:text-white dark:prose-a:text-white dark:prose-em:text-white dark:prose-strong:text-white dark:prose-li:text-white dark:prose-code:text-white dark:prose-ol:text-white dark:prose-ul:text-white`}
-          >
-            <Markdown
-              remarkPlugins={[gfm]}
-              components={{
-                img: ({ src, alt }) =>
-                  src ? (
-                    <img
-                      src={src}
-                      alt={alt || "Image"}
-                      className="rounded-lg mx-auto"
-                    />
-                  ) : null,
-              }}
-            >
-              {post.content}
-            </Markdown>
-          </div>
-        </div>
-      ) : (
-        <div className="w-full h-full flex">
-          {isPreview ? (
-            <Textarea
-              className={`h-full dark:text-white bg-white max-w-screen-md rounded-lg`}
-              onChange={(e) =>
-                setPost((prev) => ({ ...prev, content: e.target.value }))
-              }
-              value={post.content}
-            />
-          ) : (
-            <div
-              className={`prose p-4 prose-sm overflow-y-scroll h-full w-full dark:bg-zinc-900 mx-auto rounded-lg max-w-screen-md bg-white
-       dark:text-white dark:prose-headings:text-white dark:prose-blockquote:text-white dark:prose-a:text-white dark:prose-em:text-white dark:prose-strong:text-white dark:prose-li:text-white dark:prose-code:text-white dark:prose-ol:text-white dark:prose-ul:text-white`}
-            >
-              <Markdown remarkPlugins={[gfm]}>{post.content}</Markdown>
+      <div className="w-full h-full flex">
+        {viewMode === "compare" ? (
+          <>
+            <div className="w-1/2 h-full pr-2">
+              <EditView post={post} setPost={setPost} />
             </div>
-          )}
-        </div>
-      )}
+            <div className="w-1/2 h-full pl-2">
+              <PreviewView post={post} />
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-full">
+            {singleViewMode === "edit" ? (
+              <EditView post={post} setPost={setPost} />
+            ) : (
+              <PreviewView post={post} />
+            )}
+          </div>
+        )}
+      </div>
     </form>
   );
 }

@@ -1,7 +1,8 @@
-ADD TO HOME cache feed
 ADD TO POST draft
 LEARN HOW THE FUCK USEOPTIMISTIC WORKS
 ADD Option to change DESCRIPTIONS / name / username
 DELETE FUNCT TO BLOG, COMMENT
-FIX MD table, syntax highlighting
+FIX MD, syntax highlighting, inline, code blocak
 Make mobile bottom menu
+Add FAVICON
+Add a Guide
