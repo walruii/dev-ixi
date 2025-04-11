@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
+import { TUserPartial } from "@/models/user";
 import { neon } from "@neondatabase/serverless";
 
 export async function followUser({ userId }: { userId: number | string }) {
@@ -64,5 +65,35 @@ export async function checkFollowed({ userId }: { userId: number | string }) {
   } catch (error) {
     console.error("Error checking follow status:", error);
     return false;
+  }
+}
+
+export async function getFollowingUsers() {
+  try {
+    const sql = await neon(process.env.DATABASE_URL as string);
+    const session = await auth();
+    if (!session?.user) {
+      return [];
+    }
+    const currentUserId = session.user.userId;
+    const followingUsers = await sql`
+      SELECT u.id, u.username, u.image, u.description
+      FROM "FOLLOW" f
+      JOIN "USER" u ON f."user_id_DES" = u.id
+      WHERE f."user_id_SRC" = ${currentUserId}
+    `;
+
+    const formattedFollowingUsers: TUserPartial[] = followingUsers.map(
+      (user) => ({
+        id: user.id,
+        username: user.username,
+        image: user.image,
+        description: user.description,
+      })
+    );
+    return formattedFollowingUsers;
+  } catch (error) {
+    console.error("Error fetching following users:", error);
+    return [];
   }
 }

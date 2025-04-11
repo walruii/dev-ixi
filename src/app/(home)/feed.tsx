@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { TBlogPartial } from "@/models/blog";
+import { TBlogFeed } from "@/models/blog";
 import {
   Card,
   CardContent,
@@ -10,11 +10,12 @@ import {
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAllBlogs } from "@/serveractions/blog";
+import { FeedEnum } from "@/models/feedenum";
 
 function Post({
   post: { id, author_username, title, b_created_at, author_image },
 }: {
-  post: TBlogPartial;
+  post: TBlogFeed;
 }) {
   return (
     <Link href={`/p/${id}`} passHref>
@@ -41,8 +42,14 @@ function Post({
   );
 }
 
-export default function Feed() {
-  const [posts, setPosts] = useState<TBlogPartial[]>([]);
+export default function Feed({
+  type = FeedEnum.HOME,
+  userId,
+}: {
+  type?: FeedEnum;
+  userId?: number | string;
+}) {
+  const [posts, setPosts] = useState<TBlogFeed[]>([]);
   const [lastSeen, setLastSeen] = useState<{ time: Date; blog_id: number }>({
     time: new Date(),
     blog_id: 0,
@@ -57,7 +64,24 @@ export default function Feed() {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const newPosts = await getAllBlogs({ lastSeen });
+        let newPosts: TBlogFeed[] = [];
+        if (type === FeedEnum.HOME) {
+          newPosts = await getAllBlogs({ lastSeen });
+        } else if (type === FeedEnum.FOLLOWING && userId) {
+          newPosts = await getAllBlogs({
+            lastSeen,
+            type: FeedEnum.FOLLOWING,
+            userId,
+          });
+        } else if (type === FeedEnum.TRENDING) {
+          newPosts = await getAllBlogs({ lastSeen, type: FeedEnum.TRENDING });
+        } else if (type === FeedEnum.PROFILE && userId) {
+          newPosts = await getAllBlogs({
+            lastSeen,
+            type: FeedEnum.PROFILE,
+            userId,
+          });
+        }
         setPosts((prev) => [...prev, ...newPosts]);
         setHasMore(newPosts.length > 0);
 
@@ -91,7 +115,7 @@ export default function Feed() {
         observer.unobserve(currentRef);
       }
     };
-  }, [hasMore, loading, lastSeen, posts]);
+  }, [hasMore, loading, lastSeen, posts, type, userId]);
 
   return (
     <>

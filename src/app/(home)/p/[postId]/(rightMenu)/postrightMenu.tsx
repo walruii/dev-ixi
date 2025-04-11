@@ -1,19 +1,17 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TBlog } from "@/models/blog";
+import { TBlogPage } from "@/models/blog";
 import Footer from "../../../footer";
 import FollowButton from "./followButton";
-import { checkFollowed } from "@/serveractions/follow";
 import { auth } from "@/auth";
 
 export default async function PostRightMenu({
   className,
   blog,
 }: {
-  blog: TBlog;
+  blog: TBlogPage;
   className?: string;
 }) {
   const { author_image, author_username, author_description } = blog;
-  const isfollowed = await checkFollowed({ userId: blog.author_id });
   const session = await auth();
 
   return (
@@ -27,7 +25,7 @@ export default async function PostRightMenu({
           <h1 className="text-3xl">{author_username}</h1>
         </div>
         <FollowButton
-          isfollowed={isfollowed}
+          isfollowed={blog.is_following}
           author_id={blog.author_id}
           session={session}
         />

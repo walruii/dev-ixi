@@ -1,8 +1,7 @@
 ADD TO HOME cache feed
 ADD TO POST draft
-FIX MD table, syntax highlighting
-Left or Right Menu
 LEARN HOW THE FUCK USEOPTIMISTIC WORKS
-ADD DESCRIPTIONS
+ADD Option to change DESCRIPTIONS / name / username
 DELETE FUNCT TO BLOG, COMMENT
-SHOW FOLLOW FEED
+FIX MD table, syntax highlighting
+Make mobile bottom menu

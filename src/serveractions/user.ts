@@ -1,16 +1,19 @@
 "use server";
 import { auth, unstable_update } from "@/auth";
 import { TResponse } from "@/models/response";
+import { TUserProfilePage } from "@/models/user";
 import { neon } from "@neondatabase/serverless";
 import { hashSync } from "bcryptjs";
 
 type TUserData = {
+  name: string;
   username: string;
   email: string;
   password: string;
 };
 
 export const createUser = async ({
+  name,
   username,
   email,
   password,
@@ -21,8 +24,11 @@ export const createUser = async ({
     const sql = await neon(process.env.DATABASE_URL as string);
     const passwordHashed = hashSync(password, 10);
     const createdAt = new Date().toISOString();
-    await sql`INSERT INTO "USER" (name, username, email, password, created_at) 
-              VALUES (${username}, ${username}, ${email}, ${passwordHashed}, ${createdAt})`;
+    const description = "Hello, I am using DEV_IXI!";
+    const image =
+      "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fpluspng.com%2Fimg-png%2Fpng-user-icon-circled-user-icon-2240.png&f=1&nofb=1&ipt=eab9e2e1c4a417a5010a79ef55dd826010816a63220b65ff24f002f762a5740c";
+    await sql`INSERT INTO "USER" (name, username, email, description, image, password, created_at) 
+              VALUES (${name}, ${username}, ${email}, ${description}, ${image}, ${passwordHashed}, ${createdAt})`;
     return { status: 200 };
   } catch (error) {
     console.error("Error inserting user:", error);
@@ -45,8 +51,8 @@ export const createUserGoogle = async ({
     const sql = await neon(process.env.DATABASE_URL as string);
     const createdAt = new Date().toISOString();
     const response =
-      await sql`INSERT INTO "USER" (name, username, email, google_id, image, created_at) 
-                VALUES (${username}, ${username}, ${email}, ${userId}, ${image}, ${createdAt}) RETURNING *`;
+      await sql`INSERT INTO "USER" (name, username, email, description, google_id, image, created_at) 
+                VALUES (${username}, ${username}, ${email}, ${"Hello, I am using DEV_IXI!"}, ${userId}, ${image}, ${createdAt}) RETURNING *`;
     await unstable_update({
       user: {
         username,
@@ -91,5 +97,62 @@ export const checkEmail = async ({ email }: { email: string }) => {
   } catch (error) {
     console.error("Error checking username:", error);
     return { status: 500, error: "Internal Error" };
+  }
+};
+
+export const getUser = async ({
+  userId,
+}: {
+  userId: string | number;
+}): Promise<TUserProfilePage | null> => {
+  if (!userId) {
+    return null;
+  }
+  try {
+    const sql = await neon(process.env.DATABASE_URL as string);
+    const [user] = await sql`
+  WITH follower_counts AS (
+    SELECT f."user_id_DES" as user_id, COUNT(*) as follow_count
+    FROM "FOLLOW" f
+    WHERE f."user_id_DES" = ${userId}
+    GROUP BY f."user_id_DES"
+  )
+  SELECT 
+    u.id, 
+    u.username, 
+    u.description, 
+    u.created_at, 
+    u.image,
+    COALESCE(fc.follow_count, 0) as follow_count,
+    COALESCE(json_agg(json_build_object('id', b.id, 'title', b.title, 'created_at', b.created_at))
+             FILTER (WHERE b.id IS NOT NULL), '[]') as blogs
+  FROM "USER" u
+  LEFT JOIN follower_counts fc ON fc.user_id = u.id
+  LEFT JOIN "BLOG" b ON b."author_id" = u.id
+  WHERE u.id = ${userId}
+  GROUP BY u.id, u.username, u.description, u.created_at, u.image, fc.follow_count
+`;
+    if (!user) {
+      return null;
+    }
+    const userWithBlogs: TUserProfilePage = {
+      id: user.id,
+      username: user.username,
+      image: user.image,
+      description: user.description,
+      created_at: user.created_at,
+      followers: user.follow_count,
+      blogs: user.blogs.map(
+        (blog: { id: number; title: string; created_at: Date }) => ({
+          id: blog.id,
+          title: blog.title,
+          created_at: blog.created_at,
+        })
+      ),
+    };
+    return userWithBlogs;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return null;
   }
 };

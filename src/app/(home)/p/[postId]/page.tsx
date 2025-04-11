@@ -8,6 +8,7 @@ import PostLeftMenu from "./(leftMenu)/postleftMenu";
 import PostRightMenu from "./(rightMenu)/postrightMenu";
 import { getBlogById } from "@/serveractions/blog";
 import CommentSection from "./(commentSection)/commentSection";
+import Link from "next/link";
 
 async function PostPageAsync({
   params,
@@ -33,18 +34,22 @@ async function PostPageAsync({
       <section className="flex-col items-center justify-center w-full">
         <article className="dark:bg-zinc-900 rounded-xl bg-white md:px-15 p-5 md:p-10 sm:mx-4 px-6 lg:px-8 mb-4">
           <div className="pb-5 flex justify-between">
-            <div className="flex gap-2 justify-center items-center">
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={blog.author_image} alt="User Image" />
-                <AvatarFallback>AN</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <p className="text-zinc-400">Post by {blog.author_username}</p>
-                <p className="text-zinc-400 font-stretch-ultra-expanded">
-                  {blog.b_created_at.toLocaleDateString()}
-                </p>
+            <Link href={`/u/${blog.author_id}`} passHref>
+              <div className="flex gap-2 justify-center items-center">
+                <Avatar className="w-10 h-10">
+                  <AvatarImage src={blog.author_image} alt="User Image" />
+                  <AvatarFallback>AN</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <p className="text-zinc-400">
+                    Post by {blog.author_username}
+                  </p>
+                  <p className="text-zinc-400 font-stretch-ultra-expanded">
+                    {blog.b_created_at.toLocaleDateString()}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
           <h1 className="w-full text-4xl sm:text-5xl font-bold">
             {blog.title}

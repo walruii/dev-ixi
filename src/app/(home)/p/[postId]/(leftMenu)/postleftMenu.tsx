@@ -1,17 +1,15 @@
-import { TBlog } from "@/models/blog";
+import { TBlogPage } from "@/models/blog";
 import LikeButton from "./like";
 import CommentLink from "./commentLink";
-import { likedByUser } from "@/serveractions/blog";
 import ShareButton from "./shareButton";
 
 export default async function PostLeftMenu({
   className,
   blog,
 }: {
-  blog: TBlog;
+  blog: TBlogPage;
   className?: string;
 }) {
-  const isLikedByUser = await likedByUser({ blogId: blog.id });
   return (
     <div className={`flex-col items-center fixed h-1/2 ${className}`}>
       <div className="h-32" />
@@ -19,7 +17,7 @@ export default async function PostLeftMenu({
         <LikeButton
           likes={blog.like_count}
           blogId={blog.id}
-          isLikedByUser={isLikedByUser}
+          isLikedByUser={blog.has_liked}
         />
       </div>
       <div className="p-4">
