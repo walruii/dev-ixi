@@ -11,7 +11,7 @@ export default async function CommentSection({
 }) {
   const session = await auth();
   return (
-    <div id="comments" className={` ${className}`}>
+    <div id="comments" className={` ${className} mb-20`}>
       <h1 className="font-bold text-3xl">Discussion</h1>
       <CreateComment blogId={blogId} />
       <Comments sessionUserId={session?.user.userId || ""} blogId={blogId} />

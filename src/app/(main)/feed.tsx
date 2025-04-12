@@ -154,7 +154,9 @@ export default function Feed({
       )}
       <div ref={observerRef} className="h-10" />
       {!hasMore && !loading && (
-        <p className="text-center text-zinc-500">No more posts available.</p>
+        <p className="text-center text-zinc-500 mb-20">
+          No more posts available.
+        </p>
       )}
     </>
   );
