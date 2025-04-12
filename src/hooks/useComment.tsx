@@ -12,7 +12,7 @@ export function useComment({ blogId }: { blogId: number }) {
     if (loading) return;
     setLoading(true);
     if (content.trim() === "") {
-      alertContext?.setAlertFunction({
+      alertContext?.setAlertDialog({
         variant: "destructive",
         title: "Error",
         description: "Comment cannot be empty!",
@@ -26,7 +26,7 @@ export function useComment({ blogId }: { blogId: number }) {
         router.push("/signin");
         return;
       }
-      alertContext?.setAlertFunction({
+      alertContext?.setAlertDialog({
         variant: "destructive",
         title: "Error",
         description: "Failed To Comment",
@@ -34,7 +34,7 @@ export function useComment({ blogId }: { blogId: number }) {
       setLoading(false);
       return;
     }
-    alertContext?.setAlertFunction({
+    alertContext?.setAlertSidebar({
       variant: "default",
       title: "Success",
       description: "Comment successfully",

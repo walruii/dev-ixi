@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useEditInfo from "@/hooks/useEditInfo";
+import { TField } from "@/serveractions/user";
 import { Label } from "@radix-ui/react-dropdown-menu";
 export default function EditProfilePicture({ image }: { image: string }) {
   const {
@@ -24,7 +25,8 @@ export default function EditProfilePicture({ image }: { image: string }) {
     handleFieldChange,
     error,
   } = useEditInfo({
-    field: image,
+    fieldName: "Image" as TField,
+    initField: image,
     changeField: () => new Promise((resolve) => resolve),
   });
   return (

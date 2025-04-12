@@ -1,7 +1,1 @@
-ADD TO POST draft
-LEARN HOW THE FUCK USEOPTIMISTIC WORKS in blog likes, comment likes
-ADD Option to change DESCRIPTIONS / name / username
-DELETE FUNCT TO BLOG, COMMENT
 Make mobile bottom menu
-ADD Cache
-FIX optimistic like

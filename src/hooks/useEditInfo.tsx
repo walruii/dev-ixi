@@ -1,15 +1,21 @@
 import { AlertContext } from "@/context/alertContextProvider";
+import { TField } from "@/serveractions/user";
 import { useContext, useState } from "react";
 
 export default function useEditInfo({
-  field,
+  fieldName,
+  initField,
   changeField,
 }: {
-  field: string;
-  changeField: (field: string) => Promise<{ status: number; message: string }>;
+  fieldName: TField;
+  initField: string;
+  changeField: (
+    field: TField,
+    value: string
+  ) => Promise<{ status: number; message: string }>;
 }) {
   const alertContext = useContext(AlertContext);
-  const [displayField, setDisplayField] = useState(field);
+  const [displayField, setDisplayField] = useState(initField);
   const [newField, setNewField] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,17 +28,17 @@ export default function useEditInfo({
     }
     setLoading(true);
     try {
-      const resp = await changeField(newField);
+      const resp = await changeField(fieldName, newField);
       if (resp.status !== 200) {
         setError(resp.message);
-        alertContext?.setAlertFunction({
+        alertContext?.setAlertDialog({
           variant: "destructive",
           title: "Error",
           description: resp.message,
         });
       } else {
         setError(null);
-        alertContext?.setAlertFunction({
+        alertContext?.setAlertDialog({
           variant: "default",
           title: "Success",
           description: resp.message,

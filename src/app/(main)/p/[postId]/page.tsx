@@ -10,6 +10,8 @@ import { getBlogById } from "@/serveractions/blog";
 import CommentSection from "./(commentSection)/commentSection";
 import Link from "next/link";
 import { COMPONENTS } from "@/lib/reactMarkdown";
+import DeleteButton from "./deleteButton";
+import { auth } from "@/auth";
 
 async function PostPageAsync({
   params,
@@ -18,6 +20,7 @@ async function PostPageAsync({
 }) {
   const { postId } = await params;
   const blog = await getBlogById(postId);
+  const session = await auth();
   if (!blog) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen py-2">
@@ -51,6 +54,9 @@ async function PostPageAsync({
                 </div>
               </div>
             </Link>
+            {session?.user.userId === Number(blog.author_id) && (
+              <DeleteButton id={blog.id} mode="blog" />
+            )}
           </div>
           <h1 className="w-full text-4xl sm:text-5xl font-bold">
             {blog.title}

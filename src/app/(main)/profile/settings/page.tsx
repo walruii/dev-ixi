@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import EditProfilePicture from "./editProfilePicture";
 import EditField from "./editField";
-import { changeUsername } from "@/serveractions/user";
+import { TField, update_user_info } from "@/serveractions/user";
 
 export default async function Page() {
   const session = await auth();
@@ -28,26 +28,26 @@ export default async function Page() {
         <div className="border-b my-2" />
         <EditField
           field={session.user.username}
-          fieldName="Username"
-          changeField={changeUsername}
+          fieldName={"Username" as TField}
+          changeField={update_user_info}
         />
         <div className="border-b my-2" />
         <EditField
           field={session.user.name}
-          fieldName="Name"
-          changeField={changeUsername}
+          fieldName={"Name" as TField}
+          changeField={update_user_info}
         />
         <div className="border-b my-2" />
         <EditField
           field={session.user.description}
-          fieldName="description"
-          changeField={changeUsername}
+          fieldName={"description" as TField}
+          changeField={update_user_info}
         />
         <div className="border-b my-2" />
         <EditField
           field={session.user.email}
-          fieldName="Email"
-          changeField={changeUsername}
+          fieldName={"Email" as TField}
+          changeField={update_user_info}
         />
         <div className="border-b my-2" />
       </div>

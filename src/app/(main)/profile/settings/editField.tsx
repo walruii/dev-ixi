@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TField } from "@/serveractions/user";
 
 export default function EditField({
   field,
@@ -23,7 +24,10 @@ export default function EditField({
 }: {
   field: string;
   fieldName: string;
-  changeField?: (field: string) => Promise<{ status: number; message: string }>;
+  changeField?: (
+    field: TField,
+    value: string
+  ) => Promise<{ status: number; message: string }>;
 }) {
   const {
     displayField,
@@ -33,7 +37,8 @@ export default function EditField({
     handleFieldChange,
     error,
   } = useEditInfo({
-    field,
+    fieldName: fieldName as TField,
+    initField: field,
     changeField,
   });
 

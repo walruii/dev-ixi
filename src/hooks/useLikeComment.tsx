@@ -90,7 +90,7 @@ export function useLikeComment({
           router.push("signin");
           return;
         }
-        alertContext?.setAlertFunction({
+        alertContext?.setAlertDialog({
           variant: "destructive",
           title: "Error",
           description: "Failed To Like",
@@ -119,7 +119,7 @@ export function useLikeComment({
         router.push("signin");
         return;
       }
-      alertContext?.setAlertFunction({
+      alertContext?.setAlertDialog({
         variant: "destructive",
         title: "Error",
         description: "Failed To Like",

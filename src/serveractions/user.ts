@@ -4,6 +4,7 @@ import { TResponse } from "@/models/response";
 import { TUserProfilePage } from "@/models/user";
 import { neon } from "@neondatabase/serverless";
 import { hashSync } from "bcryptjs";
+import { toLower } from "lodash";
 
 type TUserData = {
   name: string;
@@ -157,20 +158,28 @@ export const getUser = async ({
   }
 };
 
-export const changeUsername = async (username: string) => {
-  if (!username || username.trim() === "") {
-    return { status: 400, message: "Username not provided" };
-  }
+export type TField = "Username" | "Name" | "Email" | "Image";
 
+export const update_user_info = async (field: TField, value: string) => {
+  if (!value || value.trim() === "" || !field) {
+    return { status: 400, message: "field not provided" };
+  }
   try {
     const sql = await neon(process.env.DATABASE_URL as string);
-    const check = await checkUsername({ username });
+    if (field === "Email") {
+      const check = await checkEmail({ email: value });
+      if (check.status !== 200) {
+        return { status: 409, message: "Email Already in use" };
+      }
+    } else if (field === "Username") {
+      const check = await checkUsername({ username: value });
+      if (check.status !== 200) {
+        return { status: 409, message: "Username Already in use" };
+      }
+    }
     const session = await auth();
     if (!session?.user) {
       return { status: 401, message: "Unauthorized" };
-    }
-    if (check.status !== 200) {
-      return { status: 409, message: "Username Already in use" };
     }
     const [existingUser] = await sql`
     SELECT 1 
@@ -181,14 +190,35 @@ export const changeUsername = async (username: string) => {
       return { status: 404, message: "User Not Found" };
     }
 
-    await sql`
+    if (field === "Username") {
+      await sql`
     UPDATE "USER"
-    SET username = ${username}
+    SET username = ${value}
     WHERE id = ${session.user.userId}
     `;
+    } else if (field === "Email") {
+      await sql`
+    UPDATE "USER"
+    SET email = ${value}
+    WHERE id = ${session.user.userId}
+    `;
+    } else if (field === "Image") {
+      await sql`
+    UPDATE "USER"
+    SET image = ${value}
+    WHERE id = ${session.user.userId}
+    `;
+    } else if (field === "Name") {
+      await sql`
+    UPDATE "USER"
+    SET name = ${value}
+    WHERE id = ${session.user.userId}
+    `;
+    }
+
     await unstable_update({
       user: {
-        username,
+        [toLower(field)]: value,
       },
     });
     return { status: 200, message: "Username Changed" };

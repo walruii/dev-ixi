@@ -146,3 +146,49 @@ ORDER BY c.created_at DESC
     return [];
   }
 }
+
+export async function deleteComment({
+  commentId,
+}: {
+  commentId: string | number;
+}) {
+  if (!commentId) {
+    return {
+      status: 400,
+      error: "Comment ID is required.",
+    };
+  }
+  try {
+    const sql = await neon(process.env.DATABASE_URL as string);
+    const session = await auth();
+    if (!session?.user) {
+      return {
+        status: 401,
+        error: "Unauthorized",
+      };
+    }
+    const userId = session.user.userId;
+
+    const [result] = await sql`
+      DELETE FROM "COMMENT"
+      WHERE id = ${commentId} AND user_id = ${userId}
+      RETURNING *
+    `;
+    if (!result) {
+      return {
+        status: 404,
+        error: "Comment not found or you are not the owner.",
+      };
+    }
+    return {
+      status: 204,
+      message: "Comment deleted successfully.",
+    };
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    return {
+      status: 500,
+      error: "Internal Server Error",
+    };
+  }
+}

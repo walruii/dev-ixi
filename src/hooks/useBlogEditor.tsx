@@ -41,7 +41,7 @@ export function usePostEditor() {
       !post.content.trim() ||
       post.title === "Your Title Here"
     ) {
-      alertContext?.setAlertFunction({
+      alertContext?.setAlertDialog({
         variant: "destructive",
         title: "Error",
         description: "Please enter valid title and content",
@@ -68,13 +68,13 @@ export function usePostEditor() {
         );
         setPost({ title: "", content: "" });
       } else if (response.status === 401) {
-        alertContext?.setAlertFunction({
+        alertContext?.setAlertDialog({
           variant: "destructive",
           title: "Error",
           description: "Please sign in to create a post",
         });
       } else if (response.status === 409) {
-        alertContext?.setAlertFunction({
+        alertContext?.setAlertDialog({
           variant: "destructive",
           title: "Error",
           description: "Post with the same title already exists",
@@ -82,7 +82,7 @@ export function usePostEditor() {
       }
     } catch (error) {
       console.error("Error creating post:", error);
-      alertContext?.setAlertFunction({
+      alertContext?.setAlertDialog({
         variant: "destructive",
         title: "Error",
         description: "An error occurred while creating the post.",

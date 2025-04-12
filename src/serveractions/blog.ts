@@ -254,3 +254,43 @@ export async function getAllBlogs({
     return [];
   }
 }
+
+export async function deleteBlog({ blogId }: { blogId: string | number }) {
+  if (!blogId) {
+    return { status: 400, message: "BlogId Not Provided" };
+  }
+  try {
+    const sql = await neon(process.env.DATABASE_URL as string);
+
+    const session = await auth();
+    if (!session?.user) {
+      return {
+        status: 401,
+        message: "Unauthorized",
+      };
+    }
+    const userId = session.user.userId;
+    const [deletedBlog] = await sql`
+    DELETE FROM "BLOG"
+    WHERE id = ${blogId} AND author_id = ${userId}
+    RETURNING *
+    `;
+    if (!deletedBlog) {
+      return {
+        status: 404,
+        message: "Blog Not Found",
+      };
+    }
+
+    return {
+      status: 204,
+      message: "Blog Deleted",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      message: "Internal Server Error. Please Try Again Later",
+    };
+  }
+}
