@@ -40,13 +40,7 @@ export default async function Page() {
         <div className="border-b my-2" />
         <EditField
           field={session.user.description}
-          fieldName={"description" as TField}
-          changeField={update_user_info}
-        />
-        <div className="border-b my-2" />
-        <EditField
-          field={session.user.email}
-          fieldName={"Email" as TField}
+          fieldName={"Description" as TField}
           changeField={update_user_info}
         />
         <div className="border-b my-2" />

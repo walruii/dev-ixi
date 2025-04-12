@@ -158,7 +158,7 @@ export const getUser = async ({
   }
 };
 
-export type TField = "Username" | "Name" | "Email" | "Image";
+export type TField = "Username" | "Name" | "Image" | "Description";
 
 export const update_user_info = async (field: TField, value: string) => {
   if (!value || value.trim() === "" || !field) {
@@ -166,12 +166,7 @@ export const update_user_info = async (field: TField, value: string) => {
   }
   try {
     const sql = await neon(process.env.DATABASE_URL as string);
-    if (field === "Email") {
-      const check = await checkEmail({ email: value });
-      if (check.status !== 200) {
-        return { status: 409, message: "Email Already in use" };
-      }
-    } else if (field === "Username") {
+    if (field === "Username") {
       const check = await checkUsername({ username: value });
       if (check.status !== 200) {
         return { status: 409, message: "Username Already in use" };
@@ -196,12 +191,6 @@ export const update_user_info = async (field: TField, value: string) => {
     SET username = ${value}
     WHERE id = ${session.user.userId}
     `;
-    } else if (field === "Email") {
-      await sql`
-    UPDATE "USER"
-    SET email = ${value}
-    WHERE id = ${session.user.userId}
-    `;
     } else if (field === "Image") {
       await sql`
     UPDATE "USER"
@@ -214,6 +203,12 @@ export const update_user_info = async (field: TField, value: string) => {
     SET name = ${value}
     WHERE id = ${session.user.userId}
     `;
+    } else if (field === "Description") {
+      await sql`
+    UPDATE "USER"
+    SET description = ${value}
+    WHERE id = ${session.user.userId}
+    `;
     }
 
     await unstable_update({
@@ -221,7 +216,7 @@ export const update_user_info = async (field: TField, value: string) => {
         [toLower(field)]: value,
       },
     });
-    return { status: 200, message: "Username Changed" };
+    return { status: 200, message: `${field} Changed` };
   } catch (error) {
     console.log(error);
     return { status: 500, message: "Internal Error. Try Again Later." };

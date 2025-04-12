@@ -122,7 +122,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
           try {
             const sql = await neon(process.env.DATABASE_URL as string);
             const response =
-              await sql`SELECT * FROM "USER" WHERE email = ${profile.email}`;
+              await sql`SELECT * FROM "USER" WHERE google_id = ${profile.id}`;
             if (response.length !== 0) {
               token.userId = Number(response[0].id);
               token.name = response[0].name;
@@ -142,6 +142,12 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         if (session) {
           if (session.user.isRegistered) {
             token.isRegistered = session.user.isRegistered;
+          }
+          if (session.user.name) {
+            token.name = session.user.name;
+          }
+          if (session.user.description) {
+            token.description = session.user.description;
           }
           if (session.user.username) {
             token.username = session.user.username;
