@@ -37,7 +37,7 @@ export default async function PostRightMenu({
           <div>Hello!</div>
         )}
       </div>
-      <Footer />
+      <Footer className="hidden lg:block" />
     </div>
   );
 }

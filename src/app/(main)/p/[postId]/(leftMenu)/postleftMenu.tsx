@@ -11,8 +11,8 @@ export default async function PostLeftMenu({
   className?: string;
 }) {
   return (
-    <div className={`flex-col items-center fixed h-1/2 ${className}`}>
-      <div className="h-32" />
+    <div className={`${className}`}>
+      <div className="hidden sm:block sm:h-32" />
       <div className="p-4">
         <LikeButton
           likes={blog.like_count}

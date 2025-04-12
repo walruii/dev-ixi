@@ -3,7 +3,6 @@ import Link from "next/link";
 import ThemeChanger from "../../(theme)/themeChanger";
 import Search from "./search";
 import { Suspense } from "react";
-import Hamburger from "./hamburger";
 import NavUser from "./navUser";
 
 export default function Navbar() {
@@ -30,9 +29,9 @@ export default function Navbar() {
           </Suspense>
           <ThemeChanger />
         </section>
-        <Suspense>
-          <Hamburger />
-        </Suspense>
+        <div className="inline md:hidden pl-2">
+          <ThemeChanger />
+        </div>
       </div>
     </nav>
   );

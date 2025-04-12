@@ -171,6 +171,7 @@ export async function getAllBlogs({
   lastSeen: {
     time: Date;
     blog_id: number;
+    like_count?: number;
   };
   type?: FeedEnum;
   userId?: string | number | null;
@@ -186,15 +187,28 @@ export async function getAllBlogs({
     let orderBy = sql`b.created_at DESC`;
 
     if (type === FeedEnum.TRENDING) {
+      const lastLikeCount = lastSeen.like_count ?? 0; // You might need to include this in the function param
+
       whereClause = sql`
-      WHERE (b.created_at, b.id) < (${lastSeen.time.toISOString()}, ${
+        WHERE (COALESCE(lc.like_count, 0), b.created_at, b.id) < (${lastLikeCount}, ${lastSeen.time.toISOString()}, ${
         lastSeen.blog_id
       })
       `;
       orderBy = sql`
-      like_count DESC, b.created_at DESC
+        COALESCE(lc.like_count, 0) DESC, b.created_at DESC, b.id DESC
       `;
     }
+
+    // if (type === FeedEnum.TRENDING) {
+    //   whereClause = sql`
+    //   WHERE (b.created_at, b.id) < (${lastSeen.time.toISOString()}, ${
+    //     lastSeen.blog_id
+    //   })
+    //   `;
+    //   orderBy = sql`
+    //   like_count DESC, b.created_at DESC
+    //   `;
+    // }
 
     if (type === FeedEnum.PROFILE && userId) {
       whereClause = sql`

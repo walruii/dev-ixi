@@ -1,6 +1,7 @@
-export default function Footer() {
+export default function Footer({ className }: { className?: string }) {
+  <Footer />;
   return (
-    <footer className="p-5">
+    <footer className={`p-5 ${className}`}>
       <h1 className="font-bold font-stretch-ultra-expanded text-center">
         DEX_IXI
       </h1>

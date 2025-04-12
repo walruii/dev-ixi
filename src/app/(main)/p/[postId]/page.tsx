@@ -29,11 +29,11 @@ async function PostPageAsync({
     );
   }
   return (
-    <div className="flex my-8 px-4 max-w-screen-2xl mx-auto relative">
+    <div className="flex sm:flex-row flex-col my-8 px-4 max-w-screen-2xl mx-auto relative">
       <div className="hidden sm:block sm:w-20 lg:w-48 shrink-0 ml-auto" />
       <PostLeftMenu
         blog={blog}
-        className="hidden sm:flex sm:w-20 lg:w-48 shrink-0 ml-auto"
+        className="flex sm:flex-col justify-between items-center sm:fixed sm:h-1/2 sm:w-20 lg:w-48 shrink-0 sm:ml-auto"
       />
       <section className="flex-col items-center justify-center w-full">
         <article className="dark:bg-zinc-900 rounded-xl bg-white md:px-15 p-5 md:p-10 sm:mx-4 px-6 lg:px-8 mb-4">
@@ -71,6 +71,7 @@ async function PostPageAsync({
             </Markdown>
           </div>
         </article>
+        <PostRightMenu blog={blog} className="block lg:hidden mb-4 sm:mx-4" />
         <CommentSection
           blogId={blog.id}
           className="dark:bg-zinc-900 rounded-xl bg-white md:px-15 p-5 md:p-10 sm:mx-4 px-6 lg:px-8"

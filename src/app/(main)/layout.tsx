@@ -1,3 +1,4 @@
+import BottomMenu from "./(nav)/BottomMenu";
 import Navbar from "./(nav)/navbar";
 
 export default function HomeLayout({
@@ -9,6 +10,7 @@ export default function HomeLayout({
     <>
       <Navbar />
       {children}
+      <BottomMenu />
     </>
   );
 }

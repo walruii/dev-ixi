@@ -66,9 +66,14 @@ export default function Feed({
   userId?: number | string;
 }) {
   const [posts, setPosts] = useState<TBlogFeed[]>([]);
-  const [lastSeen, setLastSeen] = useState<{ time: Date; blog_id: number }>({
+  const [lastSeen, setLastSeen] = useState<{
+    time: Date;
+    blog_id: number;
+    like_count: number;
+  }>({
     time: new Date(),
     blog_id: 0,
+    like_count: 0,
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -103,7 +108,11 @@ export default function Feed({
 
         if (newPosts.length > 0) {
           const lastBlog = newPosts[newPosts.length - 1];
-          setLastSeen({ time: lastBlog.b_created_at, blog_id: lastBlog.id });
+          setLastSeen({
+            time: lastBlog.b_created_at,
+            blog_id: lastBlog.id,
+            like_count: lastBlog.like_count,
+          });
         }
       } catch (error) {
         console.error("Error fetching posts:", error);
