@@ -17,7 +17,7 @@ import { signOut } from "next-auth/react";
 import { useContext, useState } from "react";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
-import { AlertContext } from "@/app/(alerts)/alertProvider";
+import { AlertContext } from "@/context/alertContextProvider";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
 

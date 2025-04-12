@@ -47,7 +47,7 @@ export const createUserGoogle = async ({
   try {
     const { user } = (await auth()) ?? {};
     if (!user) return { status: 401, error: "Unauthorized" };
-    const { email, userId, image } = user;
+    const { email, userId: userId, image } = user;
     const sql = await neon(process.env.DATABASE_URL as string);
     const createdAt = new Date().toISOString();
     const response =
@@ -154,5 +154,46 @@ export const getUser = async ({
   } catch (error) {
     console.error("Error fetching user:", error);
     return null;
+  }
+};
+
+export const changeUsername = async (username: string) => {
+  if (!username || username.trim() === "") {
+    return { status: 400, message: "Username not provided" };
+  }
+
+  try {
+    const sql = await neon(process.env.DATABASE_URL as string);
+    const check = await checkUsername({ username });
+    const session = await auth();
+    if (!session?.user) {
+      return { status: 401, message: "Unauthorized" };
+    }
+    if (check.status !== 200) {
+      return { status: 409, message: "Username Already in use" };
+    }
+    const [existingUser] = await sql`
+    SELECT 1 
+    FROM "USER" 
+    WHERE id = ${session.user.userId}
+    `;
+    if (!existingUser) {
+      return { status: 404, message: "User Not Found" };
+    }
+
+    await sql`
+    UPDATE "USER"
+    SET username = ${username}
+    WHERE id = ${session.user.userId}
+    `;
+    await unstable_update({
+      user: {
+        username,
+      },
+    });
+    return { status: 200, message: "Username Changed" };
+  } catch (error) {
+    console.log(error);
+    return { status: 500, message: "Internal Error. Try Again Later." };
   }
 };

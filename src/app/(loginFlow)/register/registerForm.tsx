@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { checkEmail, checkUsername, createUser } from "@/serveractions/user";
 import { signIn } from "next-auth/react";
 import { useContext, useState } from "react";
-import { AlertContext } from "@/app/(alerts)/alertProvider";
+import { AlertContext } from "@/context/alertContextProvider";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
 const registerFormSchema = z.object({

@@ -9,30 +9,33 @@ import Google from "next-auth/providers/google";
 declare module "next-auth" {
   interface Session {
     user: {
-      userId: string;
-      name?: string | null | undefined;
-      username?: string | null | undefined;
-      email?: string | null | undefined;
-      image?: string | null | undefined;
-      isRegistered?: boolean | null | undefined;
+      userId: number;
+      name: string | null | undefined;
+      username: string | null | undefined;
+      email: string | null | undefined;
+      image: string | null | undefined;
+      description: string | null | undefined;
+      isRegistered: boolean | null | undefined;
     };
     name?: string; // for updating name
   }
   interface JWT {
-    userId: string;
+    userId: number;
     name: string;
     username: string;
     email: string;
     image: string;
+    description: string;
     isRegistered: boolean;
   }
   interface User {
-    id?: string | undefined;
-    name?: string | null | undefined;
-    username?: string | null | undefined;
-    email?: string | null | undefined;
-    image?: string | null | undefined;
-    isRegistered?: boolean | null | undefined;
+    id?: string;
+    name?: string | null;
+    username: string | null;
+    email?: string | null;
+    image?: string | null;
+    description: string | null;
+    isRegistered: boolean | null;
   }
   interface Profile {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,7 +80,8 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
             name: response[0].name,
             username: response[0].username,
             email: response[0].email,
-            image: response[0]?.image || "",
+            image: response[0].image,
+            description: response[0].description,
             isRegistered: true,
           };
 
@@ -106,11 +110,12 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
       session?: Session;
     }) {
       if (account) {
-        token.userId = user.id;
+        token.userId = Number(user.id);
         token.name = user.name;
         token.username = user.username;
         token.email = user.email;
         token.image = user.image;
+        token.description = user.description;
         token.isRegistered = user.isRegistered;
 
         if (profile) {
@@ -119,10 +124,11 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
             const response =
               await sql`SELECT * FROM "USER" WHERE email = ${profile.email}`;
             if (response.length !== 0) {
-              token.userId = response[0].id;
+              token.userId = Number(response[0].id);
               token.name = response[0].name;
               token.image = response[0].image;
               token.username = response[0].username;
+              token.description = response[0].description;
               token.isRegistered = true;
             } else {
               token.isRegistered = false;
@@ -152,10 +158,11 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
     },
     async session({ session, token }: { session: Session; token: JWT }) {
       session.user.name = token.name;
-      session.user.userId = token.userId as string;
+      session.user.userId = token.userId as number;
       session.user.image = token.image as string;
       session.user.username = token.username as string;
       session.user.email = token.email as string;
+      session.user.description = token.description as string;
       session.user.isRegistered = token.isRegistered as boolean;
       return session;
     },

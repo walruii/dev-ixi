@@ -1,4 +1,4 @@
-import { AlertContext } from "@/app/(alerts)/alertProvider";
+import { AlertContext } from "@/context/alertContextProvider";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_MARKDOWN } from "@/models/defaultMarkDown";
@@ -16,23 +16,6 @@ export function usePostEditor() {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const setAlert = ({
-    variant = "default",
-    title,
-    description,
-  }: {
-    variant: "default" | "destructive";
-    title: string;
-    description: string;
-  }) => {
-    alertContext?.setAlert(
-      <Alert variant={variant}>
-        <Terminal className="h-4 w-4" />
-        <AlertTitle>{title}</AlertTitle>
-        <AlertDescription>{description}</AlertDescription>
-      </Alert>
-    );
-  };
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       localStorage.setItem("post", JSON.stringify(post));
@@ -58,7 +41,7 @@ export function usePostEditor() {
       !post.content.trim() ||
       post.title === "Your Title Here"
     ) {
-      setAlert({
+      alertContext?.setAlertFunction({
         variant: "destructive",
         title: "Error",
         description: "Please enter valid title and content",
@@ -85,13 +68,13 @@ export function usePostEditor() {
         );
         setPost({ title: "", content: "" });
       } else if (response.status === 401) {
-        setAlert({
+        alertContext?.setAlertFunction({
           variant: "destructive",
           title: "Error",
           description: "Please sign in to create a post",
         });
       } else if (response.status === 409) {
-        setAlert({
+        alertContext?.setAlertFunction({
           variant: "destructive",
           title: "Error",
           description: "Post with the same title already exists",
@@ -99,7 +82,7 @@ export function usePostEditor() {
       }
     } catch (error) {
       console.error("Error creating post:", error);
-      setAlert({
+      alertContext?.setAlertFunction({
         variant: "destructive",
         title: "Error",
         description: "An error occurred while creating the post.",

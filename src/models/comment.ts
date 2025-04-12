@@ -6,4 +6,8 @@ export type TComment = {
   created_at: Date;
   username: string;
   image: string;
+  likes: number;
+  dislikes: number;
+  has_liked: boolean;
+  has_disliked: boolean;
 };
