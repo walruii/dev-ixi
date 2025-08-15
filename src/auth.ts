@@ -122,7 +122,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
           try {
             const sql = await neon(process.env.DATABASE_URL as string);
             const response =
-              await sql`SELECT * FROM "USER" WHERE google_id = ${profile.id}`;
+              await sql`SELECT * FROM "USER" WHERE email = ${profile.email}`;
             if (response.length !== 0) {
               token.userId = Number(response[0].id);
               token.name = response[0].name;
@@ -196,8 +196,8 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
           const userRes =
             await sql`SELECT * FROM "USER" WHERE email = ${profile.email}`;
           if (!userRes.length) {
-            // const created_at = new Date().toISOString();
-            // await sql`INSERT INTO "USER" (email, name, image, google_id, created_at) VALUES (${profile.email}, ${profile.name}, ${profile.picture}, ${account.providerAccountId}, ${created_at}) RETURNING *`;
+            const created_at = new Date().toISOString();
+            await sql`INSERT INTO "USER" (email, name, image, google_id, created_at) VALUES (${profile.email}, ${profile.name}, ${profile.picture}, ${account.providerAccountId}, ${created_at}) RETURNING *`;
           } else if (!userRes[0].google_id) {
             await `UPDATE "USER" SET google_id = ${account.providerAccountId} WHERE email = ${profile.email} RETURNING *`;
           }
