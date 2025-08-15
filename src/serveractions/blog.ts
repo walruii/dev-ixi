@@ -26,13 +26,13 @@ export async function createBlog({
     }
     const userId = session.user.userId;
     const created_at = new Date().toISOString();
-    const [existingPost] = await sql`SELECT 1 FROM "BLOG" 
+    const [existingPost] = await sql`SELECT 1 FROM "BLOG"
                                      WHERE title = ${title.trim()} AND author_id = ${userId}`;
     if (existingPost) {
       return { status: 409, error: "Post already exists" };
     }
     const [blog] =
-      await sql`INSERT INTO "BLOG" (title, content, author_id, created_at) 
+      await sql`INSERT INTO "BLOG" (title, content, author_id, created_at)
               VALUES (${title}, ${content}, ${userId}, ${created_at})
               RETURNING id`;
     return { status: 201, id: blog.id };
@@ -76,15 +76,15 @@ export async function getBlogById(id: string): Promise<TBlogPage | null> {
       WHERE user_id = ${userId} AND blog_id = ${id}
     )
 
-    SELECT 
-      u.id AS author_id, 
-      u.username, 
-      u.image, 
-      u.created_at AS u_created_at, 
-      u.description AS u_description, 
-      b.id, 
-      b.title, 
-      b.content, 
+    SELECT
+      u.id AS author_id,
+      u.username,
+      u.image,
+      u.created_at AS u_created_at,
+      u.description AS u_description,
+      b.id,
+      b.title,
+      b.content,
       b.created_at AS b_created_at,
       COALESCE(lc.like_count, 0) AS like_count,
       COALESCE(cc.comment_count, 0) AS comment_count,
@@ -128,7 +128,7 @@ export async function getBlogById(id: string): Promise<TBlogPage | null> {
         FROM "COMMENT"
         GROUP BY blog_id
       )
-      SELECT u.id as author_id, u.username, u.image, u.created_at AS u_created_at, u.description as u_description, 
+      SELECT u.id as author_id, u.username, u.image, u.created_at AS u_created_at, u.description as u_description,
             b.id, b.title, b.content, b.created_at AS b_created_at,
             COALESCE(lc.like_count, 0) as like_count,
             COALESCE(cc.comment_count, 0) as comment_count
@@ -187,28 +187,17 @@ export async function getAllBlogs({
     let orderBy = sql`b.created_at DESC`;
 
     if (type === FeedEnum.TRENDING) {
-      const lastLikeCount = lastSeen.like_count ?? 0; // You might need to include this in the function param
+      const lastLikeCount = lastSeen.like_count ?? 0;
 
       whereClause = sql`
-        WHERE (COALESCE(lc.like_count, 0), b.created_at, b.id) < (${lastLikeCount}, ${lastSeen.time.toISOString()}, ${
+      WHERE (COALESCE(lc.like_count, 0), b.created_at, b.id) > (${lastLikeCount}, ${lastSeen.time.toISOString()}, ${
         lastSeen.blog_id
       })
       `;
       orderBy = sql`
-        COALESCE(lc.like_count, 0) DESC, b.created_at DESC, b.id DESC
+      COALESCE(lc.like_count, 0) DESC, b.created_at DESC, b.id DESC
       `;
     }
-
-    // if (type === FeedEnum.TRENDING) {
-    //   whereClause = sql`
-    //   WHERE (b.created_at, b.id) < (${lastSeen.time.toISOString()}, ${
-    //     lastSeen.blog_id
-    //   })
-    //   `;
-    //   orderBy = sql`
-    //   like_count DESC, b.created_at DESC
-    //   `;
-    // }
 
     if (type === FeedEnum.PROFILE && userId) {
       whereClause = sql`
@@ -240,7 +229,7 @@ export async function getAllBlogs({
       FROM "COMMENT"
       GROUP BY blog_id
     )
-    SELECT u.username, u.image, u.created_at AS u_created_at, u.description as u_description, 
+    SELECT u.username, u.image, u.created_at AS u_created_at, u.description as u_description,
        b.id, b.title, b.created_at AS b_created_at,
       COALESCE(lc.like_count, 0) as like_count,
       COALESCE(cc.comment_count, 0) as comment_count

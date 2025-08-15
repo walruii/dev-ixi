@@ -24,6 +24,7 @@ async function TrendingBlogs() {
     lastSeen: { time: new Date(), blog_id: 0 },
     type: FeedEnum.TRENDING,
   });
+  console.log(blogs);
   return (
     <>
       {blogs.map((blog) => (
