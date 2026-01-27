@@ -52,7 +52,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       authorize: async (
-        credentials: Partial<Record<"email" | "password", unknown>>
+        credentials: Partial<Record<"email" | "password", unknown>>,
       ): Promise<User | null> => {
         try {
           if (!credentials) {
@@ -70,7 +70,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
           if (
             !bycrpt.compareSync(
               credentials.password as string,
-              response[0].password
+              response[0].password,
             )
           ) {
             return null;
@@ -103,7 +103,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
       session,
     }: {
       token: JWT;
-      account: Account | null;
+      account?: Account | null;
       user: User | AdapterUser;
       profile?: Profile | undefined;
       trigger?: "update" | "signIn" | "signUp" | undefined;
@@ -181,7 +181,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
       account,
       profile,
     }: {
-      account: Account | null;
+      account?: Account | null;
       profile?: Profile | undefined;
     }): Promise<boolean> {
       if (!account) {
